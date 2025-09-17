@@ -35,12 +35,12 @@
 
 <hr />
 
-<section>
+ <!--<section>
   <h2>Screenshots</h2>
   <p>(Add a few screenshots or a gif of your game in action here)</p>
-  <!-- Example placeholder -->
-  <!-- <img src="screenshot1.png" alt="Game Screenshot" class="screenshot" /> -->
-</section>
+  Example placeholder 
+<img src="screenshot1.png" alt="Game Screenshot" class="screenshot" /> 
+</section>-->
 
 <hr />
 
@@ -60,7 +60,7 @@
 <section>
   <h2>Installation</h2>
   <p>To run this game locally:</p>
-  <pre><code>git clone https://github.com/yourusername/snake-evolution.git</code></pre>
+  <pre><code>git clone https://github.com/AjaysDevWorkspace/SnakeEvolution.git</code></pre>
   <p>Then open <code>index.html</code> in any modern web browser.</p>
   <p>No additional setup or dependencies are required.</p>
 </section>
