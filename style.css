@@ -1,0 +1,49 @@
+body {
+    text-align: center;
+    background: #181818;
+    font-family: Arial, sans-serif;
+    color: #fff;
+}
+
+#game-container {
+    display: inline-block;
+    position: relative;
+}
+
+#gameBoard {
+    background: #222;
+    border: 2px solid #444;
+    margin-bottom: 10px;
+}
+
+#scoreBox {
+    margin: 6px 0;
+    font-size: 18px;
+}
+
+#evoBox {
+    font-size: 16px;
+    color: #ff45a3;
+    margin-bottom: 8px;
+}
+
+#buttons {
+    margin-top: 10px;
+}
+
+#buttons button {
+    background-color: #39ff14;
+    border: none;
+    color: #181818;
+    font-weight: bold;
+    padding: 8px 14px;
+    margin: 0 5px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+#buttons button:disabled {
+    background-color: #444;
+    cursor: not-allowed;
+}

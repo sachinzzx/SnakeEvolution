@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Snake: Evolution</title>
+  <link rel="shortcut icon" href="./images/Snake_Game.png" type="image/x-icon">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2>Snake: Evolution</h2>
+  <div id="game-container">
+    <canvas id="gameBoard" width="400" height="400"></canvas>
+    <div id="scoreBox">Score: <span id="score">0</span></div>
+    <div id="evoBox"></div>
+
+    <div id="buttons">
+        <button id="startBtn">Start</button>
+        <button id="pauseBtn" disabled>Pause</button>
+        <button id="resetBtn" disabled>Reset</button>
+      </div>
+  </div>
+  <p>Arrow keys to move. Eat the pink powerup for wall pass.<br>
+    Try not to crash! Reload page to restart.</p>
+  <script src="script.js"></script>
+</body>
+</html>
