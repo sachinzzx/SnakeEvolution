@@ -1,65 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Snake: Evolution - GitHub README Preview</title>
-<style>
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
-      Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    background: #121212;
-    color: #e0e0e0;
-    max-width: 900px;
-    margin: 1em auto;
-    padding: 1em 2em;
-    line-height: 1.6;
-  }
-  h1, h2, h3 {
-    color: #39ff14;
-  }
-  hr {
-    border: none;
-    border-top: 1px solid #333;
-    margin: 2em 0;
-  }
-  pre {
-    background: #222;
-    padding: 1em;
-    overflow-x: auto;
-    border-radius: 6px;
-    font-size: 15px;
-  }
-  code {
-    font-family: "Source Code Pro", monospace, monospace;
-    background: #2d2d2d;
-    padding: 0.15em 0.3em;
-    border-radius: 4px;
-    font-size: 90%;
-  }
-  a {
-    color: #ff4fff;
-    text-decoration: none;
-  }
-  a:hover {
-    text-decoration: underline;
-  }
-  ul {
-    margin-left: 1.5em;
-  }
-  section {
-    margin-bottom: 2em;
-  }
-  img.screenshot {
-    max-width: 100%;
-    border: 1px solid #333;
-    border-radius: 6px;
-    margin: 1em 0;
-  }
-</style>
-</head>
-<body>
-
 <h1>Snake: Evolution</h1>
 
 <section>
@@ -192,5 +130,4 @@
   <p>Feel free to reach out with questions or feedback!</p>
 </section>
 
-</body>
-</html>
+
