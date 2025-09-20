@@ -1,3 +1,22 @@
+// Complete scroll prevention 
+(function() {
+    var keys = {37: 1, 38: 1, 39: 1, 40: 1}; // Arrow keys
+
+    function preventDefault(e) {
+        e.preventDefault();
+    }
+
+    function preventDefaultForScrollKeys(e) {
+        if (keys[e.keyCode]) {
+            preventDefault(e);
+            return false;
+        }
+    }
+
+    // Disable scroll for arrow keys only
+    document.onkeydown = preventDefaultForScrollKeys;
+})();
+
 const firebaseConfig = {
     apiKey: "AIzaSyDRDvlwalRpidbThvTEMK6FZVsDnK5FSOQ",
     authDomain: "snakeevolution-90ebd.firebaseapp.com",
@@ -158,21 +177,14 @@ function randomEmptyTile() {
 }
 
 document.addEventListener('keydown', function (e) {
-    // Prevent arrow keys from scrolling the page
-    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
-        e.preventDefault();
-    }
-
     if (e.key === 'ArrowLeft' && direction.x !== 1) nextDirection = { x: -1, y: 0 };
     if (e.key === 'ArrowUp' && direction.y !== 1) nextDirection = { x: 0, y: -1 };
     if (e.key === 'ArrowRight' && direction.x !== -1) nextDirection = { x: 1, y: 0 };
     if (e.key === 'ArrowDown' && direction.y !== -1) nextDirection = { x: 0, y: 1 };
 
-    // Make the snake start moving on first key press
     if ((direction.x === 0 && direction.y === 0) && (nextDirection.x !== 0 || nextDirection.y !== 0)) {
         direction = { ...nextDirection };
     }
-    // Optionally, we can also make the game auto-start on key press if you want:
     if (!gameRunning) { startBtn.click(); }
 });
 
@@ -385,6 +397,7 @@ resetBtn.onclick = () => {
     resetBtn.disabled = true;
     resetGame();
 };
+
 
 
 window.onload = function () {
