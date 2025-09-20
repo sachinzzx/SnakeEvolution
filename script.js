@@ -103,17 +103,16 @@ async function displayLeaderboard() {
 
         let html = `<table><tr><th>Rank</th><th>User</th><th>Score</th></tr>`;
         let rank = 1;
-        let myRow = '';
+
         query.forEach(doc => {
             const data = doc.data();
             const uname = data.username || 'Unknown';
             const isMe = uname === uniqueUsername(user);
-            let row = `<tr${isMe ? ' class="me"' : ''}><td>${rank}</td><td>${uname}</td><td>${data.score}</td></tr>`;
-            if (isMe) myRow = row;
-            else html += row;
+            // Keep all rows in proper rank order, just highlight your row
+            html += `<tr${isMe ? ' class="me"' : ''}><td>${rank}</td><td>${uname}</td><td>${data.score}</td></tr>`;
             rank++;
         });
-        html += myRow;
+
         html += `</table>`;
         leaderboardDiv.innerHTML = html;
         profileMenu.style.display = 'none';
@@ -157,7 +156,13 @@ function randomEmptyTile() {
     while (snake.some(seg => seg.x === pos.x && seg.y === pos.y));
     return pos;
 }
+
 document.addEventListener('keydown', function (e) {
+    // Prevent arrow keys from scrolling the page
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+        e.preventDefault();
+    }
+
     if (e.key === 'ArrowLeft' && direction.x !== 1) nextDirection = { x: -1, y: 0 };
     if (e.key === 'ArrowUp' && direction.y !== 1) nextDirection = { x: 0, y: -1 };
     if (e.key === 'ArrowRight' && direction.x !== -1) nextDirection = { x: 1, y: 0 };
@@ -167,9 +172,10 @@ document.addEventListener('keydown', function (e) {
     if ((direction.x === 0 && direction.y === 0) && (nextDirection.x !== 0 || nextDirection.y !== 0)) {
         direction = { ...nextDirection };
     }
-    //   Optionally, we can also make the game auto-start on key press if you want:
+    // Optionally, we can also make the game auto-start on key press if you want:
     if (!gameRunning) { startBtn.click(); }
 });
+
 
 
 let bestScore = Number(localStorage.getItem('snake_best') || 0);
@@ -318,6 +324,7 @@ function update() {
 
 function gameOver() {
     gameRunning = false;
+    document.body.classList.remove('game-active');
     saveScoreIfBest();
     draw(); // to show game over overlay
 }
@@ -355,6 +362,7 @@ startBtn.onclick = () => {
         pauseBtn.textContent = 'Pause';
         pauseBtn.disabled = false;
         resetBtn.disabled = false;
+        document.body.classList.add('game-active'); // Prevent page scroll
         if (!animationId) loop();
     }
 };
@@ -362,9 +370,11 @@ pauseBtn.onclick = () => {
     if (gameRunning) {
         gameRunning = false;
         pauseBtn.textContent = 'Resume';
+        document.body.classList.remove('game-active');
     } else {
         gameRunning = true;
         pauseBtn.textContent = 'Pause';
+        document.body.classList.add('game-active');
         if (!animationId) loop();
     }
 };
