@@ -2,7 +2,7 @@ const firebaseConfig = {
     apiKey: "AIzaSyDRDvlwalRpidbThvTEMK6FZVsDnK5FSOQ",
     authDomain: "snakeevolution-90ebd.firebaseapp.com",
     projectId: "snakeevolution-90ebd",
-    storageBucket: "snakeevolution-90ebd.firebasestorage.app",
+    storageBucket: "snakeevolution-90ebd.appspot.com",
     messagingSenderId: "408698178876",
     appId: "1:408698178876:web:86c7ec9e7d802556f2a239"
 };
@@ -10,9 +10,8 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const auth = firebase.auth();
 
-
 const loginBtn = document.getElementById('login-btn');
-const profileBtn = document.getElementById('profile-btn');
+const profileToggle = document.getElementById('profile-toggle');
 const profileMenu = document.getElementById('profile-menu');
 const profilePic = document.getElementById('profile-pic');
 const profileName = document.getElementById('profile-name');
@@ -21,100 +20,108 @@ const menuUsername = document.getElementById('menu-username');
 const menuEmail = document.getElementById('menu-email');
 const logoutBtn = document.getElementById('logoutBtn');
 const showLeaderboardBtn = document.getElementById('showLeaderboardBtn');
-const leaderboardSection = document.getElementById('leadboard-section');
+const leaderboardSection = document.getElementById('leaderboard-section');
 const leaderboardDiv = document.getElementById('leaderboard');
-const noLeaderboardMsg = document.getElementById('no-leaderboard-msg');
+const guestMessage = document.getElementById('guest-message');
 
-function hideProfileMenuEverywhere(e) {
-    if (!profileMenu.contains(e.target) && !profileBtn.contains(e.target)) {
+profileMenu.style.display = 'none';
+document.body.addEventListener('click', e => {
+    if (!profileMenu.contains(e.target) && !profileToggle.contains(e.target))
         profileMenu.style.display = 'none';
-    }
-}
-document.body.addEventListener('click', hideProfileMenuEverywhere);
-
-loginBtn.addEventListener('click', () => {
+});
+profileToggle.onclick = e => {
+    e.stopPropagation();
+    profileMenu.style.display = (profileMenu.style.display === 'block') ? 'none' : 'block';
+};
+loginBtn.onclick = () => {
     const provider = new firebase.auth.GoogleAuthProvider();
     auth.signInWithPopup(provider);
-});
-
-profileBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    if (profileMenu.style.display === 'block') profileMenu.style.display = 'none';
-    else profileMenu.style.display = 'block';
-});
-
-// Hide menu by default
-profileMenu.style.display = 'none';
-
+};
 logoutBtn.onclick = () => {
     auth.signOut();
     profileMenu.style.display = 'none';
     leaderboardSection.style.display = 'none';
 };
+showLeaderboardBtn.onclick = () => displayLeaderboard();
 
-// Navbar UI reacts to Auth
-auth.onAuthStateChanged((user) => {
+auth.onAuthStateChanged(user => {
     if (user) {
-        // Show profile UI
-        loginBtn.style.display = 'none';
-        profileBtn.style.display = '';
+        loginBtn.style.display = "none";
+        profileToggle.style.display = "";
         profilePic.src = user.photoURL || "https://i.imgur.com/LN8kHtP.png";
         profilePicMenu.src = user.photoURL || "https://i.imgur.com/LN8kHtP.png";
         profileName.textContent = user.displayName?.split(' ')[0] || '';
-        menuUsername.textContent = user.displayName || user.email;
+        menuUsername.textContent = uniqueUsername(user);
         menuEmail.textContent = user.email;
-        document.getElementById('submitScoreBtn').disabled = false;
-        noLeaderboardMsg.textContent = '';
+        guestMessage.textContent = "";
+        loadBestScore();
     } else {
-        // Show login btn, hide profile stuff
-        loginBtn.style.display = '';
-        profileBtn.style.display = 'none';
-        profileMenu.style.display = 'none';
+        loginBtn.style.display = "";
+        profileToggle.style.display = "none";
+        profileMenu.style.display = "none";
         profilePic.src = "https://i.imgur.com/LN8kHtP.png";
         profileName.textContent = '';
-        leaderboardSection.style.display = 'none';
-        document.getElementById('submitScoreBtn').disabled = true;
-        noLeaderboardMsg.textContent = "Login to submit and view the leaderboard!";
+        leaderboardSection.style.display = "none";
+        guestMessage.textContent = "Login to submit scores and view the leaderboard.";
+        loadBestScore();
     }
 });
 
-// Leaderboard menu opens leaderboard section
-showLeaderboardBtn.onclick = async function () {
+// Unique username generator
+function uniqueUsername(user) {
+    if (!user) return "";
+    const namePart = user.displayName?.replace(/\s+/g, "") || user.email.split('@')[0];
+    return namePart + "_" + user.uid.slice(-4);
+}
+
+// Display leaderboard
+async function displayLeaderboard() {
     leaderboardSection.style.display = 'block';
-    if (!auth.currentUser) {
-        leaderboardDiv.innerHTML = `<p>Login to see leaderboard.</p>`;
+    const user = auth.currentUser;
+    leaderboardDiv.innerHTML = "";
+    if (!user) {
+        leaderboardDiv.innerHTML = `<p style="color:var(--accent2)">Login to see leaderboard.</p>`;
         return;
     }
     const query = await db.collection('scores').orderBy('score', 'desc').limit(10).get();
-    let html = `<table style="width:100%; color:#fff;"><tr><th>Rank</th><th>User</th><th>Score</th></tr>`;
+    let html = `<table><tr><th>Rank</th><th>User</th><th>Score</th></tr>`;
     let rank = 1;
+    let myRow = '';
     query.forEach(doc => {
         const data = doc.data();
-        html += `<tr><td>${rank}</td><td>${data.username || 'Unknown'}</td><td>${data.score}</td></tr>`;
+        const uname = data.username || 'Unknown';
+        const isMe = uname === uniqueUsername(user);
+        let row = `<tr${isMe ? ' class="me"' : ''}><td>${rank}</td><td>${uname}</td><td>${data.score}</td></tr>`;
+        if (isMe) myRow = row;
+        else html += row;
         rank++;
     });
+    html += myRow; // Move your row to end, to highlight if out of top 10
     html += `</table>`;
     leaderboardDiv.innerHTML = html;
     profileMenu.style.display = 'none';
-};
+}
 
-// ---- Snake Game + Leaderboard submit (same as before) ----
+// ----- SNAKE GAME LOGIC below -----
 const canvas = document.getElementById('gameBoard');
 const ctx = canvas.getContext('2d');
-const box = 20;
-let snake = [{ x: 10, y: 10 }];
-let direction = { x: 0, y: 0 };
-let nextDirection = { x: 0, y: 0 };
-let food = randomTile();
-let score = 0;
-let evo = null;
-let evoActive = false;
-let evoTimer = 0;
-let gameRunning = false;
-let frameCount = 0;
-let moveDelay = 9;
-let bestScore = 0;
-let animationId = null;
+const box = 20; // cell size
+let snake, direction, nextDirection, food, score, evo, evoActive, evoTimer, gameRunning, frameCount, moveDelay, animationId;
+function initGameVars() {
+    snake = [{ x: 10, y: 10 }];
+    direction = { x: 0, y: 0 };
+    nextDirection = { x: 0, y: 0 };
+    food = randomTile();
+    score = 0;
+    evo = null;
+    evoActive = false;
+    evoTimer = 0;
+    frameCount = 0;
+    moveDelay = 9;
+    document.getElementById('score').textContent = score;
+    document.getElementById('evoBox').textContent = '';
+}
+let userBestScore = 0;
 
 function randomTile() {
     return {
@@ -124,42 +131,125 @@ function randomTile() {
 }
 function randomEmptyTile() {
     let pos;
-    do {
-        pos = randomTile();
-    } while (snake.some(seg => seg.x === pos.x && seg.y === pos.y));
+    do { pos = randomTile(); }
+    while (snake.some(seg => seg.x === pos.x && seg.y === pos.y));
     return pos;
 }
-
 document.addEventListener('keydown', function (e) {
     if (e.key === 'ArrowLeft' && direction.x !== 1) nextDirection = { x: -1, y: 0 };
     if (e.key === 'ArrowUp' && direction.y !== 1) nextDirection = { x: 0, y: -1 };
     if (e.key === 'ArrowRight' && direction.x !== -1) nextDirection = { x: 1, y: 0 };
     if (e.key === 'ArrowDown' && direction.y !== -1) nextDirection = { x: 0, y: 1 };
+
+    // Make the snake start moving on first key press
+    if ((direction.x === 0 && direction.y === 0) && (nextDirection.x !== 0 || nextDirection.y !== 0)) {
+        direction = { ...nextDirection };
+    }
+    //   Optionally, we can also make the game auto-start on key press if you want:
+    if (!gameRunning) { startBtn.click(); }
 });
 
-function draw() {
-    ctx.fillStyle = "#222";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Food
-    ctx.fillStyle = "#ffcb05";
-    ctx.fillRect(food.x * box, food.y * box, box, box);
+let bestScore = Number(localStorage.getItem('snake_best') || 0);
 
-    // Evo powerup
-    if (evo) {
-        ctx.fillStyle = "#ff45a3";
-        ctx.beginPath();
-        ctx.arc(evo.x * box + box / 2, evo.y * box + box / 2, box / 2, 0, 2 * Math.PI);
-        ctx.fill();
+
+//Scores functions 
+function loadBestScore() {
+    const user = auth.currentUser;
+    console.log("this is user : ", user);
+    if (!user) {
+        bestScore = Number(localStorage.getItem('snake_best') || 0);
+    } else {
+        // fetch from firestore
+        db.collection('scores').doc(user.uid).get().then(doc => {
+            bestScore = (doc.exists && typeof doc.data().score === "number") ? doc.data().score : 0;
+            document.getElementById('bestScoreBox').textContent = "Best Score :" + bestScore;
+        });
     }
-
-    // Snake
-    for (let i = 0; i < snake.length; i++) {
-        ctx.fillStyle = i ? "#39ff14" : "#fff";
-        ctx.fillRect(snake[i].x * box, snake[i].y * box, box - 2, box - 2);
-    }
+    document.getElementById('bestScoreBox').textContent = "Best Score :" + bestScore;
 }
 
+function saveScoreIfBest() {
+    const user = auth.currentUser;
+    console.log("this is user : ", user);
+    if (!user) {
+        if (score > bestScore) {
+            localStorage.setItem('snake_best', score);
+            bestScore = score;
+        }
+    } else {
+        if (score > bestScore) {
+            bestScore = score;
+            db.collection('scores').doc(user.uid)
+                .set({ username: uniqueUsername(user), score: bestScore });
+        }
+    }
+    document.getElementById('bestScoreBox').textContent = "Best Score :" + bestScore;
+}
+
+
+
+function draw() {
+    ctx.fillStyle = "#242140";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Food
+    ctx.fillStyle = "#ffcb05";
+    ctx.fillRect(food.x * box + 3, food.y * box + 3, box - 6, box - 6);
+    // Evo powerup
+    if (evo) {
+        ctx.save();
+        ctx.shadowColor = "#ff45a3";
+        ctx.shadowBlur = 16;
+        ctx.fillStyle = "#ff45a3";
+        ctx.beginPath();
+        ctx.arc(evo.x * box + box / 2, evo.y * box + box / 2, box / 2 - 2, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.restore();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "#fff";
+        ctx.beginPath();
+        ctx.arc(evo.x * box + box / 2, evo.y * box + box / 2, box / 2 - 2, 0, 2 * Math.PI);
+        ctx.stroke();
+    }
+    // Snake
+    for (let i = 0; i < snake.length; i++) {
+        ctx.save();
+        ctx.fillStyle = i === 0 ? "#ececec" : "url(#snake-gradient)";
+        ctx.shadowColor = i === 0 ? "#39ff14" : "#181818";
+        ctx.shadowBlur = i === 0 ? 16 : 3;
+        ctx.fillRect(snake[i].x * box + 2, snake[i].y * box + 2, box - 4, box - 4);
+        ctx.restore();
+        // cute eye for head:
+        if (i === 0) {
+            ctx.fillStyle = "#2a2f36";
+            ctx.beginPath();
+            ctx.arc(snake[i].x * box + box * 0.7, snake[i].y * box + box * 0.45, 2.4, 0, 2 * Math.PI);
+            ctx.fill();
+        }
+    }
+
+
+    if (!gameRunning && (score > 0 || snake.length > 1)) {
+        ctx.save();
+        ctx.globalAlpha = 0.88;
+        ctx.fillStyle = "#19172d";
+        ctx.fillRect(0, 160, canvas.width, 80);
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = "#ff45a3";
+        ctx.font = "bold 34px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("GAME OVER", canvas.width / 2, 200);
+        ctx.font = "22px Arial";
+        ctx.fillStyle = "white";
+        ctx.fillText("Score: " + score, canvas.width / 2, 228);
+        ctx.fillStyle = "#39ff14";
+        ctx.textAlign = "center";
+        ctx.font = "16px Arial";
+        ctx.fillText("Best: " + bestScore, canvas.width / 2, 250);
+        ctx.restore();
+    }
+
+}
 function update() {
     if (direction.x === 0 && direction.y === 0) return;
     direction = nextDirection;
@@ -167,11 +257,10 @@ function update() {
         x: snake[0].x + direction.x,
         y: snake[0].y + direction.y
     };
+    // Wall collision unless evoActive
     if (!evoActive &&
-        (head.x < 0 || head.x >= canvas.width / box ||
-            head.y < 0 || head.y >= canvas.height / box)) {
+        (head.x < 0 || head.x >= canvas.width / box || head.y < 0 || head.y >= canvas.height / box))
         return gameOver();
-    }
     if (evoActive) {
         head.x = (head.x + canvas.width / box) % (canvas.width / box);
         head.y = (head.y + canvas.height / box) % (canvas.height / box);
@@ -181,18 +270,19 @@ function update() {
             document.getElementById('evoBox').textContent = '';
         }
     }
+    // Self collision
     if (snake.some(seg => seg.x === head.x && seg.y === head.y)) return gameOver();
     snake.unshift(head);
-
+    // Eat food
     if (head.x === food.x && head.y === food.y) {
         score++;
         document.getElementById('score').textContent = score;
         food = randomEmptyTile();
-        if (!evo && Math.random() < 0.2) evo = randomEmptyTile();
+        if (!evo && Math.random() < 0.22) evo = randomEmptyTile();
     } else if (evo && head.x === evo.x && head.y === evo.y) {
         evoActive = true;
-        evoTimer = 40;
-        document.getElementById('evoBox').textContent = 'Wall pass active!';
+        evoTimer = 44;
+        document.getElementById('evoBox').textContent = 'WALL PASS ACTIVE!';
         evo = null;
     } else {
         snake.pop();
@@ -200,10 +290,9 @@ function update() {
 }
 
 function gameOver() {
-    if (score > bestScore) bestScore = score;
     gameRunning = false;
-    document.getElementById('pauseBtn').disabled = true;
-    document.getElementById('submitScoreBtn').disabled = !auth.currentUser;
+    saveScoreIfBest();
+    draw(); // to show game over overlay
 }
 
 function loop() {
@@ -216,36 +305,30 @@ function loop() {
     }
     draw();
 }
-
 function resetGame() {
-    snake = [{ x: 10, y: 10 }];
-    direction = { x: 0, y: 0 };
-    nextDirection = { x: 0, y: 0 };
-    food = randomTile();
-    score = 0;
-    evo = null;
-    evoActive = false;
-    evoTimer = 0;
-    frameCount = 0;
-    document.getElementById('score').textContent = score;
-    document.getElementById('evoBox').textContent = '';
+    if (animationId) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+    }
+    initGameVars();
+    draw();
 }
 
-// Button controls
 const startBtn = document.getElementById('startBtn');
 const pauseBtn = document.getElementById('pauseBtn');
 const resetBtn = document.getElementById('resetBtn');
-const submitScoreBtn = document.getElementById('submitScoreBtn');
+
 
 startBtn.onclick = () => {
     if (!gameRunning) {
+        if (snake.length > 1 || score > 0 || direction.x !== 0 || direction.y !== 0) {
+            resetGame();
+        }
         gameRunning = true;
         pauseBtn.textContent = 'Pause';
         pauseBtn.disabled = false;
         resetBtn.disabled = false;
-        if (!animationId) {
-            loop();
-        }
+        if (!animationId) loop();
     }
 };
 pauseBtn.onclick = () => {
@@ -263,27 +346,16 @@ resetBtn.onclick = () => {
     pauseBtn.textContent = 'Pause';
     pauseBtn.disabled = true;
     resetBtn.disabled = true;
-    submitScoreBtn.disabled = true;
-    if (animationId) {
-        cancelAnimationFrame(animationId);
-        animationId = null;
-    }
     resetGame();
+};
+
+
+window.onload = function () {
+    profileToggle.style.display = 'none';
+    pauseBtn.disabled = true;
+    resetBtn.disabled = true;
+    leaderboardSection.style.display = "none";
+    loadBestScore();
+    initGameVars();
     draw();
 };
-
-submitScoreBtn.onclick = async function () {
-    if (!auth.currentUser) return;
-    const user = auth.currentUser;
-    const docRef = db.collection('scores').doc(user.uid);
-    const doc = await docRef.get();
-    if (doc.exists && doc.data().score >= bestScore) {
-        alert('Your previous best score is higher!');
-        return;
-    }
-    await docRef.set({ username: user.displayName, score: bestScore });
-    alert('Score submitted!');
-    submitScoreBtn.disabled = true;
-};
-
-draw();
