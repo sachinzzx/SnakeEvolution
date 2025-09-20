@@ -75,6 +75,14 @@ function uniqueUsername(user) {
 }
 
 // Display leaderboard
+db.enablePersistence().catch(function (err) {
+    if (err.code == 'failed-precondition') {
+        console.warn('Multiple tabs open, persistence can only be enabled in one tab.');
+    } else if (err.code == 'unimplemented') {
+        console.warn('Persistence is not available in this browser.');
+    }
+});
+
 async function displayLeaderboard() {
     leaderboardSection.style.display = 'block';
     const user = auth.currentUser;
@@ -83,24 +91,38 @@ async function displayLeaderboard() {
         leaderboardDiv.innerHTML = `<p style="color:var(--accent2)">Login to see leaderboard.</p>`;
         return;
     }
-    const query = await db.collection('scores').orderBy('score', 'desc').limit(10).get();
-    let html = `<table><tr><th>Rank</th><th>User</th><th>Score</th></tr>`;
-    let rank = 1;
-    let myRow = '';
-    query.forEach(doc => {
-        const data = doc.data();
-        const uname = data.username || 'Unknown';
-        const isMe = uname === uniqueUsername(user);
-        let row = `<tr${isMe ? ' class="me"' : ''}><td>${rank}</td><td>${uname}</td><td>${data.score}</td></tr>`;
-        if (isMe) myRow = row;
-        else html += row;
-        rank++;
-    });
-    html += myRow; // Move your row to end, to highlight if out of top 10
-    html += `</table>`;
-    leaderboardDiv.innerHTML = html;
-    profileMenu.style.display = 'none';
+
+    try {
+        const query = await db.collection('scores').orderBy('score', 'desc').limit(10).get();
+
+        if (query.empty) {
+            leaderboardDiv.innerHTML = `<p style="color:var(--accent2)">No scores yet. Be the first to play!</p>`;
+            profileMenu.style.display = 'none';
+            return;
+        }
+
+        let html = `<table><tr><th>Rank</th><th>User</th><th>Score</th></tr>`;
+        let rank = 1;
+        let myRow = '';
+        query.forEach(doc => {
+            const data = doc.data();
+            const uname = data.username || 'Unknown';
+            const isMe = uname === uniqueUsername(user);
+            let row = `<tr${isMe ? ' class="me"' : ''}><td>${rank}</td><td>${uname}</td><td>${data.score}</td></tr>`;
+            if (isMe) myRow = row;
+            else html += row;
+            rank++;
+        });
+        html += myRow;
+        html += `</table>`;
+        leaderboardDiv.innerHTML = html;
+        profileMenu.style.display = 'none';
+    } catch (error) {
+        console.error("Error loading leaderboard:", error);
+        leaderboardDiv.innerHTML = `<p style="color:var(--accent2)">Error loading leaderboard. Check connection.</p>`;
+    }
 }
+
 
 // ----- SNAKE GAME LOGIC below -----
 const canvas = document.getElementById('gameBoard');
@@ -159,15 +181,20 @@ function loadBestScore() {
     console.log("this is user : ", user);
     if (!user) {
         bestScore = Number(localStorage.getItem('snake_best') || 0);
+        document.getElementById('bestScoreBox').textContent = "Best Score: " + bestScore;
     } else {
         // fetch from firestore
         db.collection('scores').doc(user.uid).get().then(doc => {
             bestScore = (doc.exists && typeof doc.data().score === "number") ? doc.data().score : 0;
-            document.getElementById('bestScoreBox').textContent = "Best Score :" + bestScore;
+            document.getElementById('bestScoreBox').textContent = "Best Score: " + bestScore;
+        }).catch(error => {
+            console.error("Error loading best score:", error);
+            bestScore = 0;
+            document.getElementById('bestScoreBox').textContent = "Best Score: " + bestScore;
         });
     }
-    document.getElementById('bestScoreBox').textContent = "Best Score :" + bestScore;
 }
+
 
 function saveScoreIfBest() {
     const user = auth.currentUser;
@@ -351,7 +378,7 @@ resetBtn.onclick = () => {
 
 
 window.onload = function () {
-    profileToggle.style.display = 'none';
+    // profileToggle.style.display = 'none';
     pauseBtn.disabled = true;
     resetBtn.disabled = true;
     leaderboardSection.style.display = "none";
