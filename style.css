@@ -3,35 +3,133 @@ body {
     background: #181818;
     font-family: Arial, sans-serif;
     color: #fff;
-}
-
-#game-container {
-    display: inline-block;
+    margin: 0;
+    padding: 0;
+  }
+  nav#main-navbar {
+    background: #23272d;
+    padding: 0 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 54px;
+    box-shadow: 0 1px 6px #111;
+  }
+  #game-logo {
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #39ff14;
+    letter-spacing: 1px;
+  }
+  #profile-area {
     position: relative;
-}
-
-#gameBoard {
+    display: flex;
+    align-items: center;
+  }
+  #profile-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px 8px;
+    display: flex;
+    align-items: center;
+    border-radius: 40px;
+    transition: background .2s;
+  }
+  #profile-btn:hover { background: #31363c; }
+  #profile-pic, #profile-pic-menu {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin-right: 7px;
+    object-fit: cover;
+    background: #444;
+  }
+  #profile-name {
+    color: #fff;
+    font-size: 1em;
+    font-weight: normal;
+  }
+  #login-btn {
+    background: #fff;
+    color: #181818;
+    font-weight: bold;
+    border: none;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-left: 12px;
+    display: flex;
+    align-items: center;
+  }
+  
+  #profile-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 42px;
+    background: #292d32;
+    color: #fff;
+    min-width: 220px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px #101010ab;
+    z-index: 120;
+    font-size: 1em;
+  }
+  #profile-info {
+    display: flex;
+    align-items: center;
+    padding: 8px 14px;
+    gap: 9px;
+  }
+  #menu-username {
+    font-weight: bold;
+    font-size: 1.07em;
+    color: #7efdff;
+  }
+  #menu-email {
+    color: #bbb;
+    font-size: 0.90em;
+  }
+  .menu-link {
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    padding: 11px 20px;
+    text-align: left;
+    font-size: 1em;
+    width: 100%;
+  }
+  .menu-link:hover {
+    background: #373c43;
+  }
+  #game-container {
+    display: inline-block;
+    margin-top: 32px;
+    position: relative;
+  }
+  #gameBoard {
     background: #222;
     border: 2px solid #444;
     margin-bottom: 10px;
-}
-
-#scoreBox {
+  }
+  #scoreBox {
     margin: 6px 0;
     font-size: 18px;
-}
-
-#evoBox {
+  }
+  #evoBox {
     font-size: 16px;
     color: #ff45a3;
     margin-bottom: 8px;
-}
-
-#buttons {
+  }
+  #buttons {
     margin-top: 10px;
-}
-
-#buttons button {
+  }
+  #buttons button,
+  #showLeaderboardBtn,
+  #submitScoreBtn {
     background-color: #39ff14;
     border: none;
     color: #181818;
@@ -41,9 +139,25 @@ body {
     cursor: pointer;
     border-radius: 4px;
     font-size: 16px;
-}
-
-#buttons button:disabled {
+  }
+  #buttons button:disabled,
+  #submitScoreBtn:disabled {
     background-color: #444;
     cursor: not-allowed;
-}
+  }
+  #leadboard-section {
+    margin-top: 18px;
+    background: #222;
+    border-radius: 8px;
+    padding: 8px;
+    width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: 0 0 6px #111;
+  }
+  #leaderboard {
+    margin-top: 10px;
+    color: #fff;
+    font-size: 15px;
+  }
+  

@@ -3,24 +3,57 @@
 <head>
   <meta charset="UTF-8">
   <title>Snake: Evolution</title>
-  <link rel="shortcut icon" href="./images/Snake_Game.png" type="image/x-icon">
   <link rel="stylesheet" href="style.css">
+  <link rel="shortcut icon" href="./images/Snake_Game.png" type="image/x-icon">
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
 </head>
 <body>
-  <h2>Snake: Evolution</h2>
+  <nav id="main-navbar">
+    <span id="game-logo">Snake: Evolution</span>
+    <div id="profile-area">
+      <button id="profile-btn">
+        <img id="profile-pic" src="https://i.imgur.com/LN8kHtP.png" alt="Profile" />
+        <span id="profile-name"></span>
+      </button>
+      <div id="profile-menu">
+        <div id="profile-info">
+          <img id="profile-pic-menu" src="https://i.imgur.com/LN8kHtP.png" alt="Profile"/>
+          <div>
+            <div id="menu-username"></div>
+            <div id="menu-email"></div>
+          </div>
+        </div>
+        <hr>
+        <button class="menu-link" id="showLeaderboardBtn" style="width:100%; text-align:left;">Leaderboard</button>
+        <button class="menu-link" id="logoutBtn" style="width:100%; text-align:left;">Logout</button>
+      </div>
+      <button id="login-btn" style="display:none;">
+        <img src="https://img.icons8.com/color/32/000000/google-logo.png" style="vertical-align:middle;" />
+        Login with Google
+      </button>
+    </div>
+  </nav>
+  
   <div id="game-container">
     <canvas id="gameBoard" width="400" height="400"></canvas>
     <div id="scoreBox">Score: <span id="score">0</span></div>
     <div id="evoBox"></div>
-
     <div id="buttons">
-        <button id="startBtn">Start</button>
-        <button id="pauseBtn" disabled>Pause</button>
-        <button id="resetBtn" disabled>Reset</button>
-      </div>
+      <button id="startBtn">Start</button>
+      <button id="pauseBtn" disabled>Pause</button>
+      <button id="resetBtn" disabled>Reset</button>
+      <button id="submitScoreBtn" disabled>Submit Score</button>
+    </div>
+
+    <div id="leadboard-section" style="display:none;">
+      <h3>Leaderboard</h3>
+      <div id="leaderboard"></div>
+    </div>
+    <p id="no-leaderboard-msg" style="color:#ff45a3;"></p>
   </div>
-  <p>Arrow keys to move. Eat the pink powerup for wall pass.<br>
-    Try not to crash! Reload page to restart.</p>
+
   <script src="script.js"></script>
 </body>
 </html>
