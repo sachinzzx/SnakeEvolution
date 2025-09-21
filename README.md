@@ -19,7 +19,6 @@ Designed for both nostalgic players and newcomers, this game combines old‑scho
 - ⚡ **Evolution Powerup**: Temporarily pass through walls after collecting a pink orb.  
 - 📈 **Real‑time Leaderboard**: Powered by Firebase Firestore — see where you rank!  
 - 💾 **Auto Score Submission**: Logged‑in users get scores saved automatically; guests store scores locally.  
-- 📱 **Responsive UI**: Play on desktop, tablet, or mobile.  
 - ⏯️ **Game Controls**: Start, pause/resume, and reset your game easily.  
 - 🔐 **Secure Google Authentication**: Sign in with your Google account to track personal stats.  
 - 🏆 **Persisted High Scores**: Scores are stored in Firestore (Google users) or LocalStorage (guests).
