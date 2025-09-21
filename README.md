@@ -42,8 +42,8 @@ Designed for both nostalgic players and newcomers, this game combines old‑scho
 ---
 
 ## 🖼️ Screenshots
-![Gameplay Screenshot](./screenshots/gameplay.png)  
-![Leaderboard Screenshot](./screenshots/leaderboard.png)
+![Gameplay Screenshot](https://d3dyfaf3iutrxo.cloudfront.net/ckeditor_uploads/2025/09/21/0f768d5cf1e046888668d8b1f16358de.png)  
+![Leaderboard Screenshot](https://d3dyfaf3iutrxo.cloudfront.net/ckeditor_uploads/2025/09/21/cd34c90540b4492d9750c7b66a2a2fc6.png)
 
 ### Gameplay  
 Snake passing through walls using the Evolution powerup.  
