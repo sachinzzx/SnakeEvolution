@@ -2,8 +2,6 @@
 
 > A modern twist on the classic Nokia Snake game — now with powerups, leaderboards, and Google authentication!
 
-![Gameplay Screenshot](./screenshots/gameplay.png)  
-![Leaderboard Screenshot](./screenshots/leaderboard.png)
 
 ---
 
@@ -44,6 +42,8 @@ Designed for both nostalgic players and newcomers, this game combines old‑scho
 ---
 
 ## 🖼️ Screenshots
+![Gameplay Screenshot](./screenshots/gameplay.png)  
+![Leaderboard Screenshot](./screenshots/leaderboard.png)
 
 ### Gameplay  
 Snake passing through walls using the Evolution powerup.  
