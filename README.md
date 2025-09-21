@@ -69,7 +69,7 @@ Top players displayed in real‑time using Firebase Firestore.
 </p>
 
 <p style="font-size: 1em; line-height: 1.6;">
-  <strong>To contribute:</strong>
+  <strong>To sachin kumar :</strong>
 </p>
 
 <ol style="font-size: 1em; line-height: 1.6; padding-left: 20px;">
